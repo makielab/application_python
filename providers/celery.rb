@@ -93,7 +93,7 @@ action :before_deploy do
         raise "No Django deployment resource found" unless django_resource
         base_command = "#{::File.join(django_resource.virtualenv, "bin", "python")} manage.py #{cmd}"
         if new_resource.use_newrelic
-          base_command = "#{::File.join(django_resource.virtualenv, "bin", "newrelic-admin")} run-program #{base_command}"
+          base_command = "newrelic-admin run-program #{base_command}"
         end
         command base_command
         if new_resource.environment

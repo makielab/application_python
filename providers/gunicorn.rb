@@ -82,14 +82,13 @@ action :before_deploy do
       raise "No Django deployment resource found" unless django_resource
       base_command = "#{::File.join(django_resource.virtualenv, "bin", "python")} manage.py run_gunicorn"
       if new_resource.use_newrelic
-        base_command = "#{::File.join(django_resource.virtualenv, "bin", "newrelic-admin")} run-program #{base_command}"
+        base_command = "newrelic-admin run-program #{base_command}"
       end
     else
       gunicorn_command = new_resource.virtualenv.nil? ? "gunicorn" : ::File.join(new_resource.virtualenv, "bin", "gunicorn")
       base_command = "#{gunicorn_command} #{new_resource.app_module}"
       if new_resource.use_newrelic
-        newrelic_command = new_resource.virtualenv.nil? ? "newrelic-admin" : ::File.join(new_resource.virtualenv, "bin", "newrelic-admin")
-        base_command = "#{newrelic_command} run-program #{base_command}"
+        base_command = "newrelic-admin run-program #{base_command}"
       end
     end
     command "#{base_command} -c #{new_resource.application.path}/shared/gunicorn_config.py"

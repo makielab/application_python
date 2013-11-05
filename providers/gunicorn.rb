@@ -73,15 +73,24 @@ action :before_deploy do
   supervisor_service new_resource.application.name do
     action :enable
     if new_resource.environment
-      environment new_resource.environment
+      environment new_resource.environment.merge({'NEW_RELIC_CONFIG_FILE' => new_resource.newrelic_config})
+    else
+      environment 'NEW_RELIC_CONFIG_FILE' => new_resource.newrelic_config
     end
     if new_resource.app_module == :django
       django_resource = new_resource.application.sub_resources.select{|res| res.type == :django}.first
       raise "No Django deployment resource found" unless django_resource
       base_command = "#{::File.join(django_resource.virtualenv, "bin", "python")} manage.py run_gunicorn"
+      if new_resource.use_newrelic
+        base_command = "#{::File.join(django_resource.virtualenv, "bin", "newrelic-admin")} run-program #{base_command}"
+      end
     else
-      gunicorn_command = new_resource.virtualenv.nil? ? "gunicorn" : "#{::File.join(new_resource.virtualenv, "bin", "gunicorn")}"
+      gunicorn_command = new_resource.virtualenv.nil? ? "gunicorn" : ::File.join(new_resource.virtualenv, "bin", "gunicorn")
       base_command = "#{gunicorn_command} #{new_resource.app_module}"
+      if new_resource.use_newrelic
+        newrelic_command = new_resource.virtualenv.nil? ? "newrelic-admin" : ::File.join(new_resource.virtualenv, "bin", "newrelic-admin")
+        base_command = "#{newrelic_command} run-program #{base_command}"
+      end
     end
     command "#{base_command} -c #{new_resource.application.path}/shared/gunicorn_config.py"
     directory new_resource.directory.nil? ? ::File.join(new_resource.path, "current") : new_resource.directory

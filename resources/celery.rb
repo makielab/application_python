@@ -30,6 +30,8 @@ attribute :camera_class, :kind_of => [String, NilClass], :default => nil
 attribute :enable_events, :kind_of => [TrueClass, FalseClass], :default => false
 attribute :environment, :kind_of => [Hash], :default => {}
 attribute :queues, :kind_of => [Array,NilClass], :default => nil
+attribute :use_newrelic, :kind_of => [TrueClass, FalseClass], :default => false
+attribute :newrelic_config, :kind_of => String, :default => "/etc/newrelic/newrelic.ini"
 
 def config_base
   config.split(/[\\\/]/).last

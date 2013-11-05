@@ -47,3 +47,5 @@ attribute :requirements, :kind_of => [NilClass, String, FalseClass], :default =>
 attribute :environment, :kind_of => [Hash], :default => {}
 attribute :autostart, :kind_of => [TrueClass, FalseClass], :default => false
 attribute :directory, :kind_of => [NilClass, String], :default => nil
+attribute :use_newrelic, :kind_of => [TrueClass, FalseClass], :default => false
+attribute :newrelic_config, :kind_of => String, :default => "/etc/newrelic/newrelic.ini"

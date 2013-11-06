@@ -93,9 +93,10 @@ action :before_deploy do
         raise "No Django deployment resource found" unless django_resource
         base_command = "#{::File.join(django_resource.virtualenv, "bin", "python")} manage.py #{cmd}"
         if new_resource.use_newrelic
-          base_command = "newrelic-admin run-program #{base_command}"
+          command "newrelic-admin run-program #{base_command}"
+        else
+          command base_command
         end
-        command base_command
         if new_resource.environment
           environment new_resource.environment.merge({'NEW_RELIC_CONFIG_FILE' => new_resource.newrelic_config})
         else
@@ -103,9 +104,10 @@ action :before_deploy do
         end
       else
         if new_resource.use_newrelic
-          cmd = "newrelic-admin run-program #{cmd}"
+          command "newrelic-admin run-program #{cmd}"
+        else
+          command cmd
         end
-        command cmd
         if new_resource.environment
           environment new_resource.environment.merge({'CELERY_CONFIG_MODULE' => new_resource.config, 'NEW_RELIC_CONFIG_FILE' => new_resource.newrelic_config})
         else
